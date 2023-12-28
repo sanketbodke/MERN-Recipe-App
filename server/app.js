@@ -16,6 +16,12 @@ app.use(express.urlencoded({ extended: true, limit: "900kb" }));
 app.use(express.static("public"));
 app.use(cookieParser());
 
-export {
-    app
-}
+// routes
+
+import userRoute from "./routes/user.route.js";
+
+// routes declaration
+
+app.use("/api/v1/users/", userRoute);
+
+export { app }
