@@ -2,33 +2,29 @@ import jwt from "jsonwebtoken";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import {User} from "../models/user.model.js";
+import { User } from "../models/user.model.js";
 
-const generateAccessAndRefreshToken = async(userId)=>{
-    try{
+const generateAccessToken = async(userId) => {
+    try {
         const user = await User.findById(userId)
         const accessToken = await user.generateAccessToken();
-        const refreshToken = await user.generateRefreshToken();
 
-        user.refreshToken = refreshToken
-        await user.save({ validateBeforeSave : false})
+        return { accessToken }
 
-        return { accessToken, refreshToken }
-
-    } catch (error){
-        throw new ApiError(500, "Something went wrong while generating access and refresh token")
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong while generating access token")
     }
 }
 
-const registerUser = asyncHandler(async(req,resp)=>{
+const registerUser = asyncHandler(async(req, resp) => {
     // get data from frontend
 
     const { username, email, password } = req.body;
 
     // validation
 
-    if(
-        [username, email, password].some((fields)=> fields.trim() === "")
+    if (
+        [username, email, password].some((fields) => fields.trim() === "")
     ) {
         throw new ApiError(400, "All fields are required")
     }
@@ -36,7 +32,7 @@ const registerUser = asyncHandler(async(req,resp)=>{
     // check if student already exists
 
     const existedUser = await User.findOne({
-        $or: [{username}, {email}]
+        $or: [{ username }, { email }]
     })
 
     if (existedUser) {
@@ -54,7 +50,7 @@ const registerUser = asyncHandler(async(req,resp)=>{
     // remove password and refresh token from response
 
     const createdUser = await User.findById(user._id).select(
-        "--password -refreshToken"
+        "--password"
     )
 
     // return response
@@ -65,22 +61,22 @@ const registerUser = asyncHandler(async(req,resp)=>{
 })
 
 
-const loginUser = asyncHandler(async (req,resp) => {
+const loginUser = asyncHandler(async(req, resp) => {
     // data from frontend
 
-    const {username, password} = req.body;
+    const { username, password } = req.body;
 
     // validation
 
-    if(!username){
+    if (!username) {
         throw new ApiError(400, "Username is required")
     }
 
     // find user
 
-    const user = await User.findOne({username})
+    const user = await User.findOne({ username })
 
-    if(!user){
+    if (!user) {
         throw new ApiError(400, "User does not exist")
     }
 
@@ -88,23 +84,23 @@ const loginUser = asyncHandler(async (req,resp) => {
 
     const isPasswordCheck = await user.isPasswordCorrect(password)
 
-    if(!isPasswordCheck){
+    if (!isPasswordCheck) {
         throw new ApiError(401, "Invalid Password")
     }
 
     // access and refresh token
 
-    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id)
+    const { accessToken } = await generateAccessToken(user._id)
 
-    const loggedInUser = await User.findById(user._id).select(" --password --refreshToken")
+    const loggedInUser = await User.findById(user._id).select(" --password")
 
     return resp
         .status(200)
         .json(
             new ApiResponse(
-                200,
-                {
+                200, {
                     user: loggedInUser,
+                    access_token: accessToken
                 },
                 "User logged in successfully"
             )
