@@ -1,0 +1,16 @@
+.authContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.authComponentContainer {
+    flex-basis: 48%;
+}
+
+.authContainer .authBgImg {
+    flex-basis: 48%;
+    height: 100vh;
+    object-fit: cover;
+    background-position: center;
+}

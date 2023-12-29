@@ -1,0 +1,48 @@
+.formContainer {
+    display: flex;
+    justify-content: center;
+    color: var(--second-color);
+}
+
+.registerFormLogo img {
+    width: 120px;
+}
+
+.registerFormLogo h2 {
+    font-size: 26px;
+    margin: 15px 0;
+}
+
+.form_group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 470px;
+}
+
+.form_group input {
+    padding: 10px;
+    border-radius: 5px;
+    margin: 15px 0;
+    font-size: 16px;
+    outline: none;
+    border: 1px solid var(--second-color);
+}
+
+.formContainer button {
+    outline: none;
+    border: none;
+    width: 100%;
+    font-size: 16px;
+    background-color: var(--primary-color);
+    color: var(--second-color);
+    padding: 10px;
+    border-radius: 5px;
+    margin: 15px 0;
+    cursor: pointer;
+}
+
+a {
+    text-decoration: none;
+    color: var(--second-color);
+}
