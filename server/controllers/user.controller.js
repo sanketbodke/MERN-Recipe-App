@@ -1,4 +1,3 @@
-import jwt from "jsonwebtoken";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -12,7 +11,7 @@ const generateAccessToken = async(userId) => {
         return { accessToken }
 
     } catch (error) {
-        throw new ApiError(500, "Something went wrong while generating access token")
+        throw new ApiError(500, `Something went wrong while generating access token`)
     }
 }
 
@@ -26,7 +25,7 @@ const registerUser = asyncHandler(async(req, resp) => {
     if (
         [username, email, password].some((fields) => fields.trim() === "")
     ) {
-        throw new ApiError(400, "All fields are required")
+        throw new ApiError(400, `All fields are required`)
     }
 
     // check if student already exists
@@ -36,7 +35,7 @@ const registerUser = asyncHandler(async(req, resp) => {
     })
 
     if (existedUser) {
-        throw new ApiError(409, "user with email and password already exists")
+        throw new ApiError(409, `user with email and password already exists`)
     }
 
     // create user object
@@ -56,7 +55,7 @@ const registerUser = asyncHandler(async(req, resp) => {
     // return response
 
     return resp.status(201).json(
-        new ApiResponse(200, createdUser, "User Register Successfully")
+        new ApiResponse(200, createdUser, `User Register Successfully`)
     )
 })
 
@@ -69,7 +68,7 @@ const loginUser = asyncHandler(async(req, resp) => {
     // validation
 
     if (!username) {
-        throw new ApiError(400, "Username is required")
+        throw new ApiError(400, `Username is required`)
     }
 
     // find user
@@ -77,7 +76,7 @@ const loginUser = asyncHandler(async(req, resp) => {
     const user = await User.findOne({ username })
 
     if (!user) {
-        throw new ApiError(400, "User does not exist")
+        throw new ApiError(400, `User does not exist`)
     }
 
     // password check
@@ -85,7 +84,7 @@ const loginUser = asyncHandler(async(req, resp) => {
     const isPasswordCheck = await user.isPasswordCorrect(password)
 
     if (!isPasswordCheck) {
-        throw new ApiError(401, "Invalid Password")
+        throw new ApiError(401, `Invalid Password`)
     }
 
     // access and refresh token
@@ -102,7 +101,7 @@ const loginUser = asyncHandler(async(req, resp) => {
                     user: loggedInUser,
                     access_token: accessToken
                 },
-                "User logged in successfully"
+                `User logged in successfully`
             )
         )
 })
