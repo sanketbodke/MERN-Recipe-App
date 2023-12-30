@@ -1,77 +1,55 @@
-import React, { useState } from "react";
-import logo from "../../../../public/assets/logo.svg";
-import "../../../styles/register.css";
-import { Link } from "react-router-dom"
+import React from "react";
+import { Form, Input, Button, message } from "antd";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import logo from "../../../../public/assets/logo.svg";
+import "../../../styles/register.css";
 
-export default function registerForm() {
-  const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  
+const RegisterForm = () => {
+  const [form] = Form.useForm();
   const navigate = useNavigate();
 
-  const onSubmit = async (event) => {
-    event.preventDefault();
+  const onFinish = async (values) => {
     try {
       await axios.post("http://localhost:3001/api/v1/users/register", {
-        username,
-        email,
-        password,
+        username: values.username,
+        email: values.email,
+        password: values.password,
       });
+      message.success("Register successful");
       navigate("/auth/login");
     } catch (err) {
+      message.error("Registration failed.");
       console.error(err);
     }
   };
 
   return (
-    <>
-      <div className="formContainer">
-        <form onSubmit={onSubmit}>
-          <div className="registerFormLogo">
-            <img src={logo} alt="logo" />
-            <h2>Create a new account</h2>
-          </div>
-          <div className="form_group">
-            <label htmlFor="username">Username </label>
-            <input
-              type="text"
-              name="username"
-              id="username"
-              onChange={(event) => {
-                setUsername(event.target.value);
-              }}
-            />
-          </div>
-
-          <div className="form_group">
-            <label htmlFor="username">email </label>
-            <input
-              type="text"
-              name="email"
-              id="email"
-              onChange={(event) => {
-                setEmail(event.target.value);
-              }}
-            />
-          </div>
-          <div className="form_group">
-            <label htmlFor="username">password</label>
-            <input
-              type="password"
-              name="password"
-              id="password"
-              onChange={(event) => {
-                setPassword(event.target.value);
-              }}
-            />
-          </div>
-          <button type="submit">Register</button>
-          <Link to="/auth/login">Already have an account ? Login </Link>
-        </form>
-      </div>
-    </>
+    <div className="formContainer">
+      <Form form={form} onFinish={onFinish}>
+        <div className="registerFormLogo">
+          <img src={logo} alt="logo" />
+          <h2>Create a new account</h2>
+        </div>
+        <Form.Item name="username" rules={[{ required: true }]}>
+          <Input placeholder="Username" className="formInput" />
+        </Form.Item>
+        <Form.Item name="email" rules={[{ required: true, type: "email" }]}>
+          <Input placeholder="Email" className="formInput" />
+        </Form.Item>
+        <Form.Item name="password" rules={[{ required: true }]}>
+          <Input.Password placeholder="Password" className="formInput" />
+        </Form.Item>
+        <Form.Item>
+          <Button type="primary" htmlType="submit">
+            Register
+          </Button>
+          <Link to="/auth/login">Already have an account? Login</Link>
+        </Form.Item>
+      </Form>
+    </div>
   );
-}
+};
+
+export default RegisterForm;
