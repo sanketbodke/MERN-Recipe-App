@@ -1,0 +1,18 @@
+nav {
+    box-shadow: 0 5px 4px rgb(146 161 176 / 15%);
+}
+
+.navbarContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navbarContainer .logo img {
+    width: 100px;
+}
+
+.navbarContainer .menuItems {
+    display: flex;
+    gap: 40px;
+}
