@@ -1,0 +1,18 @@
+.createRecipe {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.createRecipe img {
+    width: 600px;
+    order: 1;
+}
+
+.createRecipeForm {
+    display: flex;
+    flex-direction: column;
+    width: 550px;
+    gap: 20px;
+}

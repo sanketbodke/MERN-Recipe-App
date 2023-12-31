@@ -1,11 +1,16 @@
 import React, { useState } from "react";
 import axios from "axios";
-
-import { useGetUserId } from "../hooks/useGetUserID";
+import Navbar from "../components/Navbar.jsx";
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
+import { Input, Form, Button, Tag, message } from "antd";
+import createRecipeImg from "../../public/assets/createRecipe.png";
+import "../styles/createRecipe.css";
+import UploadWidget from "../components/UploadWidget.jsx";
+import { useGetUserId } from "../hooks/useGetUserId";
 
-export default function createRecipe() {
+const CreateRecipe = () => {
+  const navigate = useNavigate();
   const userId = useGetUserId();
   const [cookies, _] = useCookies(["access_token"]);
 
@@ -16,32 +21,41 @@ export default function createRecipe() {
     instructions: "",
     recipeImg: "",
     cookingTime: 0,
-    userOwner: userId,
+    userOwner: userId, 
   });
 
-  const navigate = useNavigate();
-
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setRecipe({ ...recipe, [name]: value });
+  const handleChange = (field, value) => {
+    setRecipe({ ...recipe, [field]: value });
   };
 
-  const handleIngredientChange = (event, index) => {
-    const { value } = event.target;
+  const handleIngredientChange = (value, index) => {
     const ingredients = [...recipe.ingredients];
     ingredients[index] = value;
-    setRecipe({ ...recipe, ingredients });
+    handleChange("ingredients", ingredients);
   };
 
   const handleAddIngredient = () => {
-    const ingredients = [...recipe.ingredients, ""];
-    setRecipe({ ...recipe, ingredients });
+    handleChange("ingredients", [...recipe.ingredients, ""]);
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleRemoveIngredient = (index) => {
+    const ingredients = [...recipe.ingredients];
+    ingredients.splice(index, 1);
+    handleChange("ingredients", ingredients);
+  };
+
+  const handleSubmit = async () => {
     try {
-      await axios.post(
+      console.log("Recipe data:", recipe);
+
+      // Validate required fields
+      const requiredFields = ["name", "instructions", "recipeImg"];
+      if (requiredFields.some((field) => !recipe[field])) {
+        console.error("Required fields are missing");
+        return;
+      }
+
+      const resp = await axios.post(
         "http://localhost:3001/api/v1/recipe/create",
         { ...recipe },
         {
@@ -49,70 +63,125 @@ export default function createRecipe() {
         }
       );
 
-      alert("Recipe Created");
+      console.log("Response:", resp);
+      message.success("Recipe Created");
       navigate("/");
     } catch (error) {
       console.error(error);
+      message.error("Failed to create recipe");
     }
   };
-  return (
-    <div className="create-recipe">
-      <h2>Create Recipe</h2>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="name">Name</label>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          value={recipe.name}
-          onChange={handleChange}
-        />
-        <label htmlFor="description">Description</label>
-        <textarea
-          id="description"
-          name="description"
-          value={recipe.description}
-          onChange={handleChange}
-        ></textarea>
-        <label htmlFor="ingredients">Ingredients</label>
 
-        {recipe.ingredients.map((ingredient, index) => (
-          <input
-            key={index}
-            type="text"
-            name="ingredients"
-            value={ingredient}
-            onChange={(event) => handleIngredientChange(event, index)}
-          />
-        ))}
-        <button type="button" onClick={handleAddIngredient}>
-          Add Ingredient
-        </button>
-        <label htmlFor="instructions">Instructions</label>
-        <textarea
-          id="instructions"
-          name="instructions"
-          value={recipe.instructions}
-          onChange={handleChange}
-        ></textarea>
-        <label htmlFor="recipeImg">Image URL</label>
-        <input
-          type="text"
-          id="recipeImg"
-          name="recipeImg"
-          value={recipe.recipeImg}
-          onChange={handleChange}
-        />
-        <label htmlFor="cookingTime">Cooking Time (minutes)</label>
-        <input
-          type="number"
-          id="cookingTime"
-          name="cookingTime"
-          value={recipe.cookingTime}
-          onChange={handleChange}
-        />
-        <button type="submit">Create Recipe</button>
-      </form>
-    </div>
+  const handleImageUpload = (imageUrl) => {
+    // Update the recipeImg state with the uploaded image URL
+    handleChange("recipeImg", imageUrl);
+  };
+
+  return (
+    <>
+      <Navbar />
+      <div className="createRecipe container">
+        <img src={createRecipeImg} alt="" />
+        <Form onFinish={handleSubmit} className="createRecipeForm">
+          <Form.Item
+            name="name"
+            rules={[{ required: true, message: "Please input the name!" }]}
+          >
+            <Input
+              placeholder="Name"
+              value={recipe.name}
+              onChange={(e) => handleChange("name", e.target.value)}
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="description"
+            rules={[
+              { required: true, message: "Please input the description!" },
+            ]}
+          >
+            <Input.TextArea
+              placeholder="Description"
+              value={recipe.description}
+              onChange={(e) => handleChange("description", e.target.value)}
+            />
+          </Form.Item>
+
+          <Form.Item name="ingredients">
+            <div>
+              {recipe.ingredients.map((ingredient, index) => (
+                <Tag
+                  key={index}
+                  closable
+                  onClose={() => handleRemoveIngredient(index)}
+                  color="blue"
+                >
+                  <Input
+                    placeholder={`Ingredient ${index + 1}`}
+                    value={ingredient}
+                    onChange={(e) =>
+                      handleIngredientChange(e.target.value, index)
+                    }
+                  />
+                </Tag>
+              ))}
+              <Button
+                type="dashed"
+                onClick={handleAddIngredient}
+                style={{ marginTop: 8 }}
+              >
+                Add Ingredient
+              </Button>
+            </div>
+          </Form.Item>
+
+          <Form.Item
+            name="instructions"
+            rules={[
+              { required: true, message: "Please input the instructions!" },
+            ]}
+          >
+            <Input.TextArea
+              placeholder="Instructions"
+              value={recipe.instructions}
+              onChange={(e) => handleChange("instructions", e.target.value)}
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="recipeImg"
+          >
+            <Input
+              placeholder="Image URL"
+              value={recipe.recipeImg}
+              onChange={(e) => handleChange("recipeImg", e.target.value)}
+            />
+            <UploadWidget onImageUpload={handleImageUpload} />
+          </Form.Item>
+
+          <Form.Item
+            name="cookingTime"
+            rules={[
+              { required: true, message: "Please input the cooking time!" },
+            ]}
+          >
+            <Input
+              type="number"
+              placeholder="Cooking Time (minutes)"
+              value={recipe.cookingTime}
+              onChange={(e) => handleChange("cookingTime", e.target.value)}
+            />
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              Create Recipe
+            </Button>
+          </Form.Item>
+        </Form>
+      </div>
+    </>
   );
-}
+};
+
+export default CreateRecipe;
