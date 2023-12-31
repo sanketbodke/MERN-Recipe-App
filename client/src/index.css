@@ -11,6 +11,36 @@
     --primary-color: #FFC100;
     --second-color: #253238;
     --white-color: #ffffff;
+    --black-color: #000000;
+}
+
+.ant-btn-primary {
+    border-color: var(--primary-color);
+    color: var(--white-color);
+    background-color: var(--primary-color);
+}
+
+.ant-btn:hover,
+.ant-btn:focus {
+    background-color: var(--primary-color) !important;
+    color: var(--white-color) !important;
+}
+
+.ant-input:focus,
+.ant-input-affix-wrapper:focus {
+    border-color: var(--primary-color);
+}
+
+.ant-input:hover,
+.ant-input-affix-wrapper:hover {
+    border-color: var(--primary-color);
+    /* Set your desired hover color */
+}
+
+.ant-tag.ant-tag-blue {
+    color: var(--white-color);
+    background: transparent !important;
+    border-color: var(--primary-color) !important;
 }
 
 .html {
@@ -28,4 +58,11 @@ body {
     max-width: 1200px;
     width: 90%;
     margin: auto;
+}
+
+.sectionHeading {
+    font-size: 24px;
+    margin: 40px 0;
+    color: var(--second-color);
+    font-weight: 600;
 }
