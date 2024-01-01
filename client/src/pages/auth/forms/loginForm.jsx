@@ -7,13 +7,21 @@ import { Link } from "react-router-dom";
 import logo from "../../../../public/assets/logo.svg";
 import "../../../styles/register.css";
 
+import { logInStart, logInSuccess ,logInFailure } from "../../../redux/user/userSlice";
+import {useDispatch, useSelector} from "react-redux"
+
 const LoginForm = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const {loading, error} = useSelector((state) => state.user)
+
   const [_, setCookies] = useCookies(["access_token"]);
 
   const onFinish = async (values) => {
     try {
+      dispatch(logInStart())
       const response = await axios.post(
         "http://localhost:3001/api/v1/users/login",
         {
@@ -22,14 +30,16 @@ const LoginForm = () => {
         }
       );
 
+      dispatch(logInSuccess(response))
+
       message.success("Login successful");
 
       setCookies("access_token", response.data.data.access_token);
-      window.localStorage.setItem("userId", response.data.data.user._id);
       navigate("/");
     } catch (err) {
       message.error("Login failed. Please check your credentials.");
       console.error(err);
+      dispatch(logInFailure(err))
     }
   };
 

@@ -7,11 +7,15 @@ import { Input, Form, Button, Tag, message } from "antd";
 import createRecipeImg from "../../public/assets/createRecipe.png";
 import "../styles/createRecipe.css";
 import UploadWidget from "../components/UploadWidget.jsx";
-import { useGetUserId } from "../hooks/useGetUserId";
+
+import {useSelector} from "react-redux"
 
 const CreateRecipe = () => {
+  const {currentUser} = useSelector(state => state.user)
+  const userId = currentUser.data.data.user._id
+
   const navigate = useNavigate();
-  const userId = useGetUserId();
+
   const [cookies, _] = useCookies(["access_token"]);
 
   const [recipe, setRecipe] = useState({
@@ -21,7 +25,7 @@ const CreateRecipe = () => {
     instructions: "",
     recipeImg: "",
     cookingTime: 0,
-    userOwner: userId, 
+    userOwner: userId,
   });
 
   const handleChange = (field, value) => {
@@ -80,105 +84,106 @@ const CreateRecipe = () => {
   return (
     <>
       <Navbar />
-      <div className="createRecipe container">
-        <img src={createRecipeImg} alt="" />
-        <Form onFinish={handleSubmit} className="createRecipeForm">
-          <Form.Item
-            name="name"
-            rules={[{ required: true, message: "Please input the name!" }]}
-          >
-            <Input
-              placeholder="Name"
-              value={recipe.name}
-              onChange={(e) => handleChange("name", e.target.value)}
-            />
-          </Form.Item>
+      <div className="createRecipeContainer container">
+        <p className="sectionHeading">Create Recipe</p>
+        <div className="createRecipe">
+          <img src={createRecipeImg} alt="" />
+          <Form onFinish={handleSubmit} className="createRecipeForm">
+            <Form.Item
+              name="name"
+              rules={[{ required: true, message: "Please input the name!" }]}
+            >
+              <Input
+                placeholder="Name"
+                value={recipe.name}
+                onChange={(e) => handleChange("name", e.target.value)}
+              />
+            </Form.Item>
 
-          <Form.Item
-            name="description"
-            rules={[
-              { required: true, message: "Please input the description!" },
-            ]}
-          >
-            <Input.TextArea
-              placeholder="Description"
-              value={recipe.description}
-              onChange={(e) => handleChange("description", e.target.value)}
-            />
-          </Form.Item>
+            <Form.Item
+              name="description"
+              rules={[
+                { required: true, message: "Please input the description!" },
+              ]}
+            >
+              <Input.TextArea
+                placeholder="Description"
+                value={recipe.description}
+                onChange={(e) => handleChange("description", e.target.value)}
+              />
+            </Form.Item>
 
-          <Form.Item name="ingredients">
-            <div>
-              {recipe.ingredients.map((ingredient, index) => (
-                <Tag
-                  key={index}
-                  closable
-                  onClose={() => handleRemoveIngredient(index)}
-                  color="blue"
+            <Form.Item name="ingredients">
+              <div>
+                {recipe.ingredients.map((ingredient, index) => (
+                  <Tag
+                    key={index}
+                    closable
+                    onClose={() => handleRemoveIngredient(index)}
+                  >
+                    <Input
+                      placeholder={`Ingredient ${index + 1}`}
+                      value={ingredient}
+                      onChange={(e) =>
+                        handleIngredientChange(e.target.value, index)
+                      }
+                    />
+                  </Tag>
+                ))}
+                <Button
+                  type="dashed"
+                  onClick={handleAddIngredient}
+                  style={{ marginTop: 8 }}
                 >
-                  <Input
-                    placeholder={`Ingredient ${index + 1}`}
-                    value={ingredient}
-                    onChange={(e) =>
-                      handleIngredientChange(e.target.value, index)
-                    }
-                  />
-                </Tag>
-              ))}
-              <Button
-                type="dashed"
-                onClick={handleAddIngredient}
-                style={{ marginTop: 8 }}
-              >
-                Add Ingredient
+                  Add Ingredient
+                </Button>
+              </div>
+            </Form.Item>
+
+            <Form.Item
+              name="instructions"
+              rules={[
+                { required: true, message: "Please input the instructions!" },
+              ]}
+            >
+              <Input.TextArea
+                placeholder="Instructions"
+                value={recipe.instructions}
+                onChange={(e) => handleChange("instructions", e.target.value)}
+              />
+            </Form.Item>
+
+            <Form.Item name="recipeImg">
+              <Input
+                placeholder="Image URL"
+                disabled
+                value={recipe.recipeImg}
+                onChange={(e) => handleChange("recipeImg", e.target.value)}
+              />
+              <UploadWidget onImageUpload={handleImageUpload} />
+            </Form.Item>
+
+            <Form.Item
+              name="cookingTime"
+              rules={[
+                { required: true, message: "Please input the cooking time!" },
+              ]}
+            >
+              <Input
+                type="number"
+                placeholder="Cooking Time (minutes)"
+                value={recipe.cookingTime}
+                onChange={(e) => handleChange("cookingTime", e.target.value)}
+              />
+            </Form.Item>
+
+            <Form.Item>
+              <Button type="primary" htmlType="submit">
+                Create Recipe
               </Button>
-            </div>
-          </Form.Item>
-
-          <Form.Item
-            name="instructions"
-            rules={[
-              { required: true, message: "Please input the instructions!" },
-            ]}
-          >
-            <Input.TextArea
-              placeholder="Instructions"
-              value={recipe.instructions}
-              onChange={(e) => handleChange("instructions", e.target.value)}
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="recipeImg"
-          >
-            <Input
-              placeholder="Image URL"
-              value={recipe.recipeImg}
-              onChange={(e) => handleChange("recipeImg", e.target.value)}
-            />
-            <UploadWidget onImageUpload={handleImageUpload} />
-          </Form.Item>
-
-          <Form.Item
-            name="cookingTime"
-            rules={[
-              { required: true, message: "Please input the cooking time!" },
-            ]}
-          >
-            <Input
-              type="number"
-              placeholder="Cooking Time (minutes)"
-              value={recipe.cookingTime}
-              onChange={(e) => handleChange("cookingTime", e.target.value)}
-            />
-          </Form.Item>
-
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              Create Recipe
-            </Button>
-          </Form.Item>
-        </Form>
+            </Form.Item>
+          </Form>
+        </div>
       </div>
     </>
   );

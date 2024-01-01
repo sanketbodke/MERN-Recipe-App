@@ -1,16 +1,23 @@
-import React, { useEffect, useState } from "react";
-import { useGetUserId } from "../hooks/useGetUserId.js";
-import axios from "axios";
+// SavedRecipes.js
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { List, Button, Card, message } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
+import Navbar from '../components/Navbar.jsx';
 
-export default function savedRecipes() {
+import { useSelector } from 'react-redux';
+
+export default function SavedRecipes() {
+  const {currentUser} = useSelector(state => state.user)
+  const userId = currentUser.data.data.user._id
+
   const [savedRecipes, setSavedRecipes] = useState([]);
-  const userID = useGetUserId();
 
   useEffect(() => {
     const fetchSavedRecipes = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3001/api/v1/recipe/savedRecipes/${userID}`
+          `http://localhost:3001/api/v1/recipe/savedRecipes/${userId}`
         );
         setSavedRecipes(response.data.data);
       } catch (err) {
@@ -19,22 +26,66 @@ export default function savedRecipes() {
     };
 
     fetchSavedRecipes();
-  }, []);
+  }, [currentUser._id]);
+
+  const removeSavedRecipe = async (recipeID) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:3001/api/v1/recipe/removeSaved/${recipeID}/${userId}`,
+        {
+          recipeID,
+          userID: currentUser._id,
+        }
+      );
+      setSavedRecipes(response.data.data.savedRecipes);
+      message.success('Recipe removed from saved!');
+    } catch (err) {
+      console.error(err);
+      message.error('Failed to remove recipe from saved');
+    }
+  };
+
   return (
-    <div>
-      <h1>Saved Recipes</h1>
-      <ul>
-        {savedRecipes.map((recipe) => (
-          <li key={recipe._id}>
-            <div>
-              <h2>{recipe.name}</h2>
-            </div>
-            <p>{recipe.description}</p>
-            <img src={recipe.imageUrl} alt={recipe.name} />
-            <p>Cooking Time: {recipe.cookingTime} minutes</p>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <>
+      <Navbar />
+      <div className="savedRecipesContainer container">
+        <p className="sectionHeading">Saved Recipes</p>
+        <List
+          grid={{ gutter: 16, column: 3 }}
+          dataSource={savedRecipes}
+          renderItem={(savedRecipe) => (
+            <List.Item>
+              <Card
+                className="recipeCard"
+                title={savedRecipe.name}
+                cover={<img alt={savedRecipe.name} src={savedRecipe.recipeImg} />}
+                actions={[
+                  <Button
+                    type="primary"
+                    icon={<DeleteOutlined />}
+                    onClick={() => removeSavedRecipe(savedRecipe._id)}
+                  >
+                    Remove from Saved
+                  </Button>,
+                ]}
+              >
+                <p>
+                  <strong>Description:</strong> {savedRecipe.description}
+                </p>
+                <p>
+                  <strong>Ingredients:</strong> {savedRecipe.ingredients.join(', ')}
+                </p>
+                <p>
+                  <strong>Instructions:</strong> {savedRecipe.instructions}
+                </p>
+                <p>
+                  <strong>Cooking Time:</strong> {savedRecipe.cookingTime} minutes
+                </p>
+              </Card>
+            </List.Item>
+          )}
+        />
+      </div>
+    </>
   );
 }

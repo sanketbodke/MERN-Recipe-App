@@ -1,5 +1,6 @@
 // UploadWidget.jsx
 import { useEffect, useRef } from 'react';
+import { Tag } from "antd";
 
 const UploadWidget = ({ onImageUpload }) => {
     const cloudinaryRef = useRef();
@@ -23,7 +24,7 @@ const UploadWidget = ({ onImageUpload }) => {
 
     return (
         <>
-            <button onClick={() => widgetRef.current.open()}>upload</button>
+            <Tag style={{marginTop: '10px', cursor: 'pointer'}} onClick={() => widgetRef.current.open()}>Upload Recipe Image</Tag>
         </>
     );
 };

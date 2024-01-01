@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useGetUserId } from "../hooks/useGetUserId.js";
 import { List, Button, Card, message } from "antd";
 import { SaveOutlined, CheckOutlined } from "@ant-design/icons";
 import Navbar from "../components/Navbar.jsx";
-import "../styles/home.css"
+import "../styles/home.css";
+
+import { useSelector } from "react-redux";
 
 export default function Home() {
   const [recipes, setRecipes] = useState([]);
   const [savedRecipes, setSavedRecipes] = useState([]);
-  const userID = useGetUserId();
+  const { currentUser } = useSelector((state) => state.user);
+  const userID = currentUser.data.data.user._id;
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -87,11 +89,11 @@ export default function Home() {
                 ]}
               >
                 <p>
-                  <strong>Description : </strong>{" "}
+                  <strong>Description : </strong>
                   {recipe.description}
                 </p>
                 <p>
-                  <strong>Ingredients : </strong>{" "}
+                  <strong>Ingredients : </strong>
                   {recipe.ingredients.join(", ")}
                 </p>
                 <p>
