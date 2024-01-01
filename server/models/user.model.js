@@ -21,7 +21,7 @@ const userSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Recipe",
     }]
-})
+}, { timestamps: true })
 
 userSchema.pre("save", async function(next) {
     if (this.isModified("password")) {
