@@ -76,6 +76,24 @@ const getSavedRecipe = asyncHandler(async(req, resp) => {
     }
 })
 
+// get user recipe
+
+const getUserRecipes = asyncHandler(async(req, resp) => {
+    const user = await User.findById(req.params.userId);
+
+    if (!user) {
+        throw new ApiError(400, `User not found`)
+    }
+
+    try {
+        const userRecipes = await Recipe.find({ userOwner: user._id });
+
+        return resp.status(200).json(new ApiResponse(200, userRecipes, `recipes fetch successfully`));
+    } catch (error) {
+        throw new ApiError(400, `User not found : ${error}`)
+    }
+
+})
 
 export {
     getAllRecipes,
@@ -83,4 +101,5 @@ export {
     savedRecipe,
     getIdsOfSavedRecipes,
     getSavedRecipe,
+    getUserRecipes
 }
