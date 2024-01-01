@@ -95,7 +95,7 @@ const getUserRecipes = asyncHandler(async(req, resp) => {
 
 })
 
-// user recipes (delete)
+// user recipe (delete)
 
 const deleteUserRecipes = asyncHandler(async(req, resp) => {
     const recipe = await Recipe.findByIdAndDelete(req.params.recipeId);
@@ -108,6 +108,61 @@ const deleteUserRecipes = asyncHandler(async(req, resp) => {
     }
 })
 
+// user recipe (update)
+
+const updateUserRecipe = asyncHandler(async(req, resp) => {
+    const recipe = req.params.recipeId;
+    const updateFields = req.body;
+
+    if (!recipe) {
+        throw new ApiError(400, `Recipe not found`)
+    }
+
+    if (!updateFields) {
+        throw new ApiError(400, `updated fields not found`)
+    }
+
+    const updatedRecipe = await Recipe.findByIdAndUpdate(
+        recipe,
+        updateFields, { new: true, runValidators: true }
+    );
+
+    if (!updatedRecipe) {
+        throw new ApiError(400, `Recipe not found`)
+    }
+
+    return resp.status(200)
+        .json(new ApiResponse(200, updateFields, "Recipe Updated Successfully"))
+})
+
+// remove saved recipes
+
+const removeSaveRecipe = asyncHandler(async(req, res) => {
+    const userId = req.params.userId;
+    const recipeId = req.params.recipeId;
+
+    if (!userId) {
+        throw new ApiError(400, `User not found`);
+    }
+
+    if (!recipeId) {
+        throw new ApiError(400, `Recipe not found`);
+    }
+
+    // Assuming you have a User model with a savedRecipes field
+    const user = await User.findByIdAndUpdate(
+        userId, { $pull: { savedRecipes: recipeId } }, // Removes the specified recipe from the savedRecipes array
+        { new: true } // Returns the updated user document
+    );
+
+    if (!user) {
+        throw new ApiError(404, `User not found`);
+    }
+
+    res.status(200).json(new ApiResponse(200, `Recipe removed from saved`, { savedRecipes: user.savedRecipes }));
+});
+
+
 export {
     getAllRecipes,
     createRecipe,
@@ -115,5 +170,7 @@ export {
     getIdsOfSavedRecipes,
     getSavedRecipe,
     getUserRecipes,
-    deleteUserRecipes
+    deleteUserRecipes,
+    updateUserRecipe,
+    removeSaveRecipe
 }
