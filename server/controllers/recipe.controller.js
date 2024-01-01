@@ -95,11 +95,25 @@ const getUserRecipes = asyncHandler(async(req, resp) => {
 
 })
 
+// user recipes (delete)
+
+const deleteUserRecipes = asyncHandler(async(req, resp) => {
+    const recipe = await Recipe.findByIdAndDelete(req.params.recipeId);
+    console.log(recipe);
+
+    if (!recipe) {
+        throw new ApiError(400, `Recipe not found`)
+    } else {
+        return resp.status(200).json(new ApiResponse(202, `recipes deleted`));
+    }
+})
+
 export {
     getAllRecipes,
     createRecipe,
     savedRecipe,
     getIdsOfSavedRecipes,
     getSavedRecipe,
-    getUserRecipes
+    getUserRecipes,
+    deleteUserRecipes
 }
