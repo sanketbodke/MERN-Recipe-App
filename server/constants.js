@@ -1,1 +1,1 @@
-export const DB_NAME = "recipe-app"
+export const DB_NAME = "Cluster0"
