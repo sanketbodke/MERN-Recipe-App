@@ -63,7 +63,14 @@ export default function Home() {
       <div className="homeContainer container">
         <p className="sectionHeading">Recipes</p>
         <List
-          grid={{ gutter: 16, column: 3 }}
+            grid={{
+                gutter: 16,
+                xs: 1,
+                sm: 2,
+                md: 3,
+                lg: 3,
+                xl: 4,
+            }}
           dataSource={recipes}
           renderItem={(recipe) => (
             <List.Item>

@@ -16,3 +16,9 @@
     width: 550px;
     gap: 10px;
 }
+
+@media (max-width: 968px) {
+    .createRecipe img{
+        display: none;
+    }
+}
