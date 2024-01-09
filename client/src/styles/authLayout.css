@@ -14,3 +14,13 @@
     object-fit: cover;
     background-position: center;
 }
+
+@media (max-width: 768px) {
+    .authContainer .authBgImg{
+        display: none;
+    }
+
+    .authComponentContainer{
+        flex-basis: 100%;
+    }
+}
