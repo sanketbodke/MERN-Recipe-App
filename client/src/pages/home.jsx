@@ -16,7 +16,7 @@ export default function Home() {
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/api/v1/recipe");
+        const response = await axios.get("https://letscook-u1xm.onrender.com/api/v1/recipe");
         setRecipes(response.data.data);
       } catch (err) {
         console.error(err);
@@ -26,7 +26,7 @@ export default function Home() {
     const fetchSavedRecipes = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3001/api/v1/recipe/savedRecipes/ids/${userID}`
+          `https://letscook-u1xm.onrender.com/api/v1/recipe/savedRecipes/ids/${userID}`
         );
         setSavedRecipes(response.data.data.savedRecipes);
       } catch (err) {
@@ -41,7 +41,7 @@ export default function Home() {
   const saveRecipe = async (recipeID) => {
     try {
       const response = await axios.put(
-        "http://localhost:3001/api/v1/recipe/save",
+        "https://letscook-u1xm.onrender.com/api/v1/recipe/save",
         {
           recipeID,
           userID,

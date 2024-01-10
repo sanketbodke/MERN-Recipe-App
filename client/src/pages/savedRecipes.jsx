@@ -17,7 +17,7 @@ export default function SavedRecipes() {
     const fetchSavedRecipes = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3001/api/v1/recipe/savedRecipes/${userId}`
+          `https://letscook-u1xm.onrender.com/api/v1/recipe/savedRecipes/${userId}`
         );
         setSavedRecipes(response.data.data);
       } catch (err) {
@@ -31,7 +31,7 @@ export default function SavedRecipes() {
   const removeSavedRecipe = async (recipeID) => {
     try {
       const response = await axios.put(
-        `http://localhost:3001/api/v1/recipe/removeSaved/${recipeID}/${userId}`,
+        `https://letscook-u1xm.onrender.com/api/v1/recipe/removeSaved/${recipeID}/${userId}`,
         {
           recipeID,
           userID: currentUser._id,

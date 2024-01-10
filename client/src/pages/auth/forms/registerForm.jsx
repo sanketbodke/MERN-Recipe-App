@@ -12,7 +12,7 @@ const RegisterForm = () => {
 
   const onFinish = async (values) => {
     try {
-      await axios.post("http://localhost:3001/api/v1/users/register", {
+      await axios.post("https://letscook-u1xm.onrender.com/api/v1/users/register", {
         username: values.username,
         email: values.email,
         password: values.password,

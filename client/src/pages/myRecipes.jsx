@@ -21,7 +21,7 @@ export default function MyRecipes() {
     const fetchRecipes = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3001/api/v1/recipe/${userId}`
+          `https://letscook-u1xm.onrender.com/api/v1/recipe/${userId}`
         );
         setRecipes(response.data.data);
       } catch (err) {
@@ -34,7 +34,7 @@ export default function MyRecipes() {
 
   const handleDelete = async (recipeId) => {
     try {
-      await axios.delete(`http://localhost:3001/api/v1/recipe/${recipeId}`);
+      await axios.delete(`https://letscook-u1xm.onrender.com/api/v1/recipe/${recipeId}`);
 
       setRecipes((prevRecipes) =>
         prevRecipes.filter((recipe) => recipe._id !== recipeId)
@@ -54,7 +54,7 @@ export default function MyRecipes() {
   const handleUpdate = async () => {
     try {
       await axios.put(
-        `http://localhost:3001/api/v1/recipe/${userId}`,
+        `https://letscook-u1xm.onrender.com/api/v1/recipe/${userId}`,
         editedRecipe
       );
 
@@ -63,7 +63,7 @@ export default function MyRecipes() {
 
       // Fetch updated recipes
       const response = await axios.get(
-        `http://localhost:3001/api/v1/recipe/${userId}`
+        `https://letscook-u1xm.onrender.com/api/v1/recipe/${userId}`
       );
       setRecipes(response.data.data);
     } catch (error) {

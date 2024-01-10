@@ -50,8 +50,6 @@ const CreateRecipe = () => {
 
   const handleSubmit = async () => {
     try {
-      console.log("Recipe data:", recipe);
-
       // Validate required fields
       const requiredFields = ["name", "instructions", "recipeImg"];
       if (requiredFields.some((field) => !recipe[field])) {
@@ -60,7 +58,7 @@ const CreateRecipe = () => {
       }
 
       const resp = await axios.post(
-        "http://localhost:3001/api/v1/recipe/create",
+        "https://letscook-u1xm.onrender.com/api/v1/recipe/create",
         { ...recipe },
         {
           headers: { authorization: cookies.access_token },
