@@ -162,6 +162,25 @@ const removeSaveRecipe = asyncHandler(async(req, res) => {
     res.status(200).json(new ApiResponse(200, `Recipe removed from saved`, { savedRecipes: user.savedRecipes }));
 });
 
+// get specific recipe by id
+
+const getRecipeById = asyncHandler(async (req,resp)=> {
+    const recipeId = req.params.id;
+
+    if (!recipeId) {
+        throw new ApiError(400, `Recipe not found`);
+    }
+
+    const recipe = await Recipe.findById(recipeId);
+
+    if (!recipe) {
+        throw new ApiError(400, `Recipe not found`);
+    }
+
+    resp.status(200).json(new ApiResponse(200, "Recipe Found", recipe))
+})
+
+
 
 export {
     getAllRecipes,
@@ -172,5 +191,6 @@ export {
     getUserRecipes,
     deleteUserRecipes,
     updateUserRecipe,
-    removeSaveRecipe
+    removeSaveRecipe,
+    getRecipeById
 }
