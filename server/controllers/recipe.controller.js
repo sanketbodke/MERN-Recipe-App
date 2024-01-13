@@ -177,7 +177,7 @@ const getRecipeById = asyncHandler(async (req,resp)=> {
         throw new ApiError(400, `Recipe not found`);
     }
 
-    resp.status(200).json(new ApiResponse(200, "Recipe Found", recipe))
+    resp.status(200).json(new ApiResponse(200, recipe, "Recipe Fetch Successfully"))
 })
 
 
