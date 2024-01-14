@@ -1,4 +1,3 @@
-// SavedRecipes.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { List, Button, Card, message } from 'antd';
@@ -6,18 +5,22 @@ import { DeleteOutlined } from '@ant-design/icons';
 import Navbar from '../components/Navbar.jsx';
 
 import { useSelector } from 'react-redux';
+import API_BASE_URL from "../constant.js";
+import RecipeDetailsModal from "../components/RecipeDetailsModal.jsx";
 
 export default function SavedRecipes() {
     const { currentUser } = useSelector((state) => state.user);
     const userId = currentUser.data.data.user._id;
 
     const [savedRecipes, setSavedRecipes] = useState([]);
+    const [detailsModalVisible, setDetailsModalVisible] = useState(false);
+    const [selectedRecipeDetails, setSelectedRecipeDetails] = useState({});
 
     useEffect(() => {
         const fetchSavedRecipes = async () => {
             try {
                 const response = await axios.get(
-                    `https://letscook-u1xm.onrender.com/api/v1/recipe/savedRecipes/${userId}`
+                    `${API_BASE_URL}/api/v1/recipe/savedRecipes/${userId}`
                 );
                 setSavedRecipes(response.data.data);
             } catch (err) {
@@ -26,12 +29,25 @@ export default function SavedRecipes() {
         };
 
         fetchSavedRecipes();
-    }, [currentUser._id]);
+    }, [userId]);
+
+    const getMoreDetailsOfRecipe = async (savedRecipeId) => {
+        try {
+            const response = await axios.get(
+                `${API_BASE_URL}/api/v1/recipe/${savedRecipeId}`
+            );
+            setSelectedRecipeDetails(response.data.data);
+            setDetailsModalVisible(true);
+        } catch (error) {
+            console.error(error);
+            message.error("Failed to fetch recipe details");
+        }
+    };
 
     const removeSavedRecipe = async (recipeID) => {
         try {
             const response = await axios.put(
-                `https://letscook-u1xm.onrender.com/api/v1/recipe/removeSaved/${recipeID}/${userId}`,
+                `${API_BASE_URL}/api/v1/recipe/removeSaved/${recipeID}/${userId}`,
                 {
                     recipeID,
                     userID: currentUser._id,
@@ -51,6 +67,11 @@ export default function SavedRecipes() {
             return words.slice(0, 10).join(' ') + '...';
         }
         return description;
+    };
+
+    const closeModal = () => {
+        setDetailsModalVisible(false);
+        setSelectedRecipeDetails({});
     };
 
     return (
@@ -84,6 +105,7 @@ export default function SavedRecipes() {
                                     </Button>,
                                     <Button
                                         type="primary"
+                                        onClick={() => getMoreDetailsOfRecipe(savedRecipe._id)}
                                     >
                                         Read More
                                     </Button>,
@@ -93,11 +115,16 @@ export default function SavedRecipes() {
                                     {truncateDescription(savedRecipe.description)}
                                 </p>
                                 {savedRecipe.description.length > 100 && (
-                                    <Button type="link">Read More</Button>
+                                    <Button type="primary" onClick={() => getMoreDetailsOfRecipe(savedRecipe._id)}>Read More</Button>
                                 )}
                             </Card>
                         </List.Item>
                     )}
+                />
+                <RecipeDetailsModal
+                    visible={detailsModalVisible}
+                    onCancel={closeModal}
+                    recipeDetails={selectedRecipeDetails}
                 />
             </div>
         </>
