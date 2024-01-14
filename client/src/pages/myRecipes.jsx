@@ -3,15 +3,18 @@ import axios from "axios";
 import Navbar from "../components/Navbar";
 import { List, Button, Card, message, Modal, Form, Input } from "antd";
 import { DeleteOutlined, EditOutlined, DownOutlined } from "@ant-design/icons";
+import { useSelector } from "react-redux";
+import API_BASE_URL from "../constant.js";
+import RecipeDetailsModal from "../components/RecipeDetailsModal.jsx";
 
 const { TextArea } = Input;
-
-import { useSelector } from "react-redux";
 
 export default function MyRecipes() {
     const [recipes, setRecipes] = useState([]);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [editedRecipe, setEditedRecipe] = useState({});
+    const [detailsModalVisible, setDetailsModalVisible] = useState(false);
+    const [selectedRecipeDetails, setSelectedRecipeDetails] = useState({});
 
     const { currentUser } = useSelector((state) => state.user);
     const userId = currentUser.data.data.user._id;
@@ -20,7 +23,7 @@ export default function MyRecipes() {
         const fetchRecipes = async () => {
             try {
                 const response = await axios.get(
-                    `https://letscook-u1xm.onrender.com/api/v1/recipe/savedRecipes/${userId}`
+                    `${API_BASE_URL}/api/v1/recipe/userRecipes/${userId}`
                 );
                 setRecipes(response.data.data);
             } catch (err) {
@@ -33,7 +36,7 @@ export default function MyRecipes() {
 
     const handleDelete = async (recipeId) => {
         try {
-            await axios.delete(`https://letscook-u1xm.onrender.com/api/v1/recipe/delete/${recipeId}`);
+            await axios.delete(`${API_BASE_URL}/api/v1/recipe/delete/${recipeId}`);
 
             setRecipes((prevRecipes) =>
                 prevRecipes.filter((recipe) => recipe._id !== recipeId)
@@ -46,23 +49,29 @@ export default function MyRecipes() {
     };
 
     const handleEdit = (recipe) => {
-        setEditedRecipe(recipe);
+        setEditedRecipe({
+            _id: recipe._id,
+            name: recipe.name,
+            description: recipe.description,
+            ingredients: recipe.ingredients.join(","),
+            instructions: recipe.instructions,
+            cookingTime: recipe.cookingTime.toString(),
+        });
         setIsModalVisible(true);
     };
 
     const handleUpdate = async () => {
         try {
             await axios.put(
-                `https://letscook-u1xm.onrender.com/api/v1/recipe/update/${userId}`,
+                `${API_BASE_URL}/api/v1/recipe/update/${editedRecipe._id}`,
                 editedRecipe
             );
 
             setIsModalVisible(false);
             message.success("Recipe updated successfully");
 
-            // Fetch updated recipes
             const response = await axios.get(
-                `https://letscook-u1xm.onrender.com/api/v1/recipe/${userId}`
+                `${API_BASE_URL}/api/v1/recipe/userRecipes/${userId}`
             );
             setRecipes(response.data.data);
         } catch (error) {
@@ -80,6 +89,24 @@ export default function MyRecipes() {
             return words.slice(0, 10).join(" ") + "...";
         }
         return description;
+    };
+
+    const getMoreDetailsOfRecipe = async (recipeId) => {
+        try {
+            const response = await axios.get(
+                `${API_BASE_URL}/api/v1/recipe/${recipeId}`
+            );
+            setSelectedRecipeDetails(response.data.data);
+            setDetailsModalVisible(true);
+        } catch (error) {
+            console.error(error);
+            message.error("Failed to fetch recipe details");
+        }
+    };
+
+    const closeModal = () => {
+        setDetailsModalVisible(false);
+        setSelectedRecipeDetails({});
     };
 
     return (
@@ -114,8 +141,7 @@ export default function MyRecipes() {
                                         icon={<EditOutlined />}
                                         onClick={() => handleEdit(recipe)}
                                     />,
-
-                                    <Button type="primary" icon={<DownOutlined />} />,
+                                    <Button type="primary" icon={<DownOutlined />} onClick={() => getMoreDetailsOfRecipe(recipe._id)} />,
                                 ]}
                             >
                                 <p>
@@ -189,6 +215,11 @@ export default function MyRecipes() {
                         </Form.Item>
                     </Form>
                 </Modal>
+                <RecipeDetailsModal
+                    visible={detailsModalVisible}
+                    onCancel={closeModal}
+                    recipeDetails={selectedRecipeDetails}
+                />
             </div>
         </>
     );
