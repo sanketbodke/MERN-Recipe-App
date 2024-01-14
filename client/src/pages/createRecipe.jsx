@@ -9,6 +9,8 @@ import "../styles/createRecipe.css";
 import UploadWidget from "../components/UploadWidget.jsx";
 
 import {useSelector} from "react-redux"
+import Spinner from "../components/Spinner.jsx";
+import API_BASE_URL from "../constant.js";
 
 const CreateRecipe = () => {
   const {currentUser} = useSelector(state => state.user)
@@ -17,6 +19,8 @@ const CreateRecipe = () => {
   const navigate = useNavigate();
 
   const [cookies, _] = useCookies(["access_token"]);
+
+  const [isLoading, setIsLoading] = useState(false)
 
   const [recipe, setRecipe] = useState({
     name: "",
@@ -50,7 +54,7 @@ const CreateRecipe = () => {
 
   const handleSubmit = async () => {
     try {
-      // Validate required fields
+      setIsLoading(true)
       const requiredFields = ["name", "instructions", "recipeImg"];
       if (requiredFields.some((field) => !recipe[field])) {
         console.error("Required fields are missing");
@@ -58,14 +62,14 @@ const CreateRecipe = () => {
       }
 
       const resp = await axios.post(
-        "https://letscook-u1xm.onrender.com/api/v1/recipe/create",
+        `${API_BASE_URL}/api/v1/recipe/create`,
         { ...recipe },
         {
           headers: { authorization: cookies.access_token },
         }
       );
-
       console.log("Response:", resp);
+      setIsLoading(false)
       message.success("Recipe Created");
       navigate("/");
     } catch (error) {
@@ -75,7 +79,6 @@ const CreateRecipe = () => {
   };
 
   const handleImageUpload = (imageUrl) => {
-    // Update the recipeImg state with the uploaded image URL
     handleChange("recipeImg", imageUrl);
   };
 
@@ -176,9 +179,15 @@ const CreateRecipe = () => {
             </Form.Item>
 
             <Form.Item>
-              <Button type="primary" htmlType="submit">
-                Create Recipe
-              </Button>
+              {isLoading ? (
+                  <Button type="primary" htmlType="submit">
+                    <Spinner />
+                  </Button>
+              ) : (
+                  <Button type="primary" htmlType="submit">
+                    Create Recipe
+                  </Button>
+              )}
             </Form.Item>
           </Form>
         </div>
