@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { List, Button, Card, message } from "antd";
+import { List, Button, Card, message, Modal } from "antd";
 import { SaveOutlined, CheckOutlined } from "@ant-design/icons";
 import Navbar from "../components/Navbar.jsx";
 import "../styles/home.css";
@@ -8,17 +8,21 @@ import "../styles/home.css";
 import { useSelector } from "react-redux";
 
 const { Meta } = Card;
+import API_BASE_URL from "../constant.js";
+import RecipeDetailsModal from "../components/RecipeDetailsModal.jsx";
 
 export default function Home() {
     const [recipes, setRecipes] = useState([]);
     const [savedRecipes, setSavedRecipes] = useState([]);
+    const [detailsModalVisible, setDetailsModalVisible] = useState(false);
+    const [selectedRecipeDetails, setSelectedRecipeDetails] = useState({});
     const { currentUser } = useSelector((state) => state.user);
     const userID = currentUser.data.data.user._id;
 
     useEffect(() => {
         const fetchRecipes = async () => {
             try {
-                const response = await axios.get("https://letscook-u1xm.onrender.com/api/v1/recipe");
+                const response = await axios.get(`${API_BASE_URL}/api/v1/recipe`);
                 setRecipes(response.data.data);
             } catch (err) {
                 console.error(err);
@@ -28,7 +32,7 @@ export default function Home() {
         const fetchSavedRecipes = async () => {
             try {
                 const response = await axios.get(
-                    `https://letscook-u1xm.onrender.com/api/v1/recipe/savedRecipes/ids/${userID}`
+                    `${API_BASE_URL}/api/v1/recipe/savedRecipes/ids/${userID}`
                 );
                 setSavedRecipes(response.data.data.savedRecipes);
             } catch (err) {
@@ -43,7 +47,7 @@ export default function Home() {
     const saveRecipe = async (recipeID) => {
         try {
             const response = await axios.put(
-                "https://letscook-u1xm.onrender.com/api/v1/recipe/save",
+                `${API_BASE_URL}/api/v1/recipe/save`,
                 {
                     recipeID,
                     userID,
@@ -65,6 +69,24 @@ export default function Home() {
             return words.slice(0, 10).join(" ") + "...";
         }
         return description;
+    };
+
+    const getMoreDetailsOfRecipe = async (recipeId) => {
+        try {
+            const response = await axios.get(
+                `${API_BASE_URL}/api/v1/recipe/${recipeId}`
+            );
+            setSelectedRecipeDetails(response.data.data);
+            setDetailsModalVisible(true);
+        } catch (error) {
+            console.error(error);
+            message.error("Failed to fetch recipe details");
+        }
+    };
+
+    const closeModal = () => {
+        setDetailsModalVisible(false);
+        setSelectedRecipeDetails({});
     };
 
     return (
@@ -103,7 +125,7 @@ export default function Home() {
                                     >
                                         {isRecipeSaved(recipe._id) ? "Saved" : "Save"}
                                     </Button>,
-                                    <Button type="primary">Read More</Button>,
+                                    <Button type="primary" onClick={() => getMoreDetailsOfRecipe(recipe._id)}>Read More</Button>,
                                 ]}
                             >
                                 <Meta
@@ -112,6 +134,11 @@ export default function Home() {
                             </Card>
                         </List.Item>
                     )}
+                />
+                <RecipeDetailsModal
+                    visible={detailsModalVisible}
+                    onCancel={closeModal}
+                    recipeDetails={selectedRecipeDetails}
                 />
             </div>
         </>
