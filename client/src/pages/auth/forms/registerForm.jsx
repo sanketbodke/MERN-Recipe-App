@@ -5,14 +5,18 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import logo from "../../../../public/assets/logo.svg";
 import "../../../styles/register.css";
+import Spinner from "../../../components/Spinner.jsx";
+import {useSelector} from "react-redux";
+import API_BASE_URL from "../../../constant.js";
 
 const RegisterForm = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const {loading, _} = useSelector((state) => state.user)
 
   const onFinish = async (values) => {
     try {
-      await axios.post("https://letscook-u1xm.onrender.com/api/v1/users/register", {
+      await axios.post(`${API_BASE_URL}/api/v1/users/register`, {
         username: values.username,
         email: values.email,
         password: values.password,
@@ -42,9 +46,15 @@ const RegisterForm = () => {
           <Input.Password placeholder="Password" className="formInput" />
         </Form.Item>
         <Form.Item>
-          <Button type="primary" htmlType="submit">
-            Register
-          </Button>
+          {loading ? (
+              <Button type="primary" htmlType="submit">
+                <Spinner />
+              </Button>
+          ) : (
+              <Button type="primary" htmlType="submit">
+                Register
+              </Button>
+          )}
           <Link to="/auth/login">Already have an account? Login</Link>
         </Form.Item>
       </Form>

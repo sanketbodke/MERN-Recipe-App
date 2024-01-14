@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Form, Input, Button, message } from "antd";
+import { Form, Input, Button, message, Spin } from "antd";
 import axios from "axios";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +9,8 @@ import "../../../styles/register.css";
 
 import { logInStart, logInSuccess ,logInFailure } from "../../../redux/user/userSlice";
 import {useDispatch, useSelector} from "react-redux"
+import Spinner from "../../../components/Spinner.jsx";
+import API_BASE_URL from "../../../constant.js";
 
 const LoginForm = () => {
   const [form] = Form.useForm();
@@ -23,7 +25,7 @@ const LoginForm = () => {
     try {
       dispatch(logInStart())
       const response = await axios.post(
-        "https://letscook-u1xm.onrender.com/api/v1/users/login",
+        `${API_BASE_URL}/api/v1/users/login`,
         {
           username: values.username,
           password: values.password,
@@ -57,9 +59,15 @@ const LoginForm = () => {
           <Input.Password placeholder="Password" className="formInput"/>
         </Form.Item>
         <Form.Item>
-          <Button type="primary" htmlType="submit">
-            Login
-          </Button>
+          {loading ? (
+              <Button type="primary" htmlType="submit">
+                <Spinner />
+              </Button>
+          ) : (
+              <Button type="primary" htmlType="submit">
+                Login
+              </Button>
+          )}
           <Link to="/auth/register">Don't have an account? Register</Link>
         </Form.Item>
       </Form>
