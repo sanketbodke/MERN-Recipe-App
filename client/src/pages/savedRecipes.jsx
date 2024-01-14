@@ -114,9 +114,6 @@ export default function SavedRecipes() {
                                 <p>
                                     {truncateDescription(savedRecipe.description)}
                                 </p>
-                                {savedRecipe.description.length > 100 && (
-                                    <Button type="primary" onClick={() => getMoreDetailsOfRecipe(savedRecipe._id)}>Read More</Button>
-                                )}
                             </Card>
                         </List.Item>
                     )}
