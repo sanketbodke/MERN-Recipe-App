@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import { Form, Input, Button, message } from "antd";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -6,21 +6,22 @@ import { useNavigate } from "react-router-dom";
 import logo from "../../../../public/assets/logo.svg";
 import "../../../styles/register.css";
 import Spinner from "../../../components/Spinner.jsx";
-import {useSelector} from "react-redux";
 import API_BASE_URL from "../../../constant.js";
 
 const RegisterForm = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  const {loading, _} = useSelector((state) => state.user)
+  const [loading, setIsLoading] = useState(false)
 
   const onFinish = async (values) => {
     try {
+      setIsLoading(true)
       await axios.post(`${API_BASE_URL}/api/v1/users/register`, {
         username: values.username,
         email: values.email,
         password: values.password,
       });
+      setIsLoading(false)
       message.success("Register successful");
       navigate("/auth/login");
     } catch (err) {
