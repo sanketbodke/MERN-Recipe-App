@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { List, Button, Card, message } from 'antd';
-import { DeleteOutlined } from '@ant-design/icons';
+import {DeleteOutlined, DownOutlined} from '@ant-design/icons';
 import Navbar from '../components/Navbar.jsx';
 
 import { useSelector } from 'react-redux';
@@ -105,6 +105,7 @@ export default function SavedRecipes() {
                                     </Button>,
                                     <Button
                                         type="primary"
+                                        icon={<DownOutlined />}
                                         onClick={() => getMoreDetailsOfRecipe(savedRecipe._id)}
                                     >
                                         Read More

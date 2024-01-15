@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { List, Button, Card, message, Modal } from "antd";
-import { SaveOutlined, CheckOutlined } from "@ant-design/icons";
+import { SaveOutlined, CheckOutlined, DownOutlined } from "@ant-design/icons";
 import Navbar from "../components/Navbar.jsx";
 import "../styles/home.css";
 
@@ -125,7 +125,7 @@ export default function Home() {
                                     >
                                         {isRecipeSaved(recipe._id) ? "Saved" : "Save"}
                                     </Button>,
-                                    <Button type="primary" onClick={() => getMoreDetailsOfRecipe(recipe._id)}>Read More</Button>,
+                                    <Button type="primary" icon={<DownOutlined />} onClick={() => getMoreDetailsOfRecipe(recipe._id)}>Read More</Button>,
                                 ]}
                             >
                                 <Meta
